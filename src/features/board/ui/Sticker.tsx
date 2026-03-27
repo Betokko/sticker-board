@@ -11,6 +11,8 @@ export function Sticker({
     isSelected,
     isEditing,
     onTextChange,
+    onMouseDown,
+    onMouseUp,
 }: {
     id: string
     ref: Ref<HTMLButtonElement>
@@ -21,12 +23,16 @@ export function Sticker({
     isSelected?: boolean
     isEditing?: boolean
     onTextChange?: (text: string) => void
+    onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void
+    onMouseUp?: (e: React.MouseEvent<HTMLButtonElement>) => void
 }) {
     return (
         <button
             data-id={id}
             ref={ref}
             onClick={onClick}
+            onMouseDown={onMouseDown}
+            onMouseUp={onMouseUp}
             className={clsx(
                 `absolute bg-yellow-200 p-2 shadow-md box-border text-left`,
                 isSelected && 'outline-2 outline-blue-500 outline-offset-4 z-100',

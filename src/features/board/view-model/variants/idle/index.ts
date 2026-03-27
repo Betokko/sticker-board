@@ -4,6 +4,7 @@ import type { ViewModel } from '../../view-model-type.ts'
 import { useDeleteSelected } from './use-delete-selected.ts'
 import { useGoToAddSticker } from './use-go-to-add-sticker.ts'
 import { useGoToEditSticker } from './use-go-to-edit-sticker.ts'
+import { useGoToNodesDragging } from './use-go-to-nodes-dragging.ts'
 import { useGoToSelectionWindow } from './use-go-to-selection-window.ts'
 import { useMouseDown } from './use-mouse-down.ts'
 import { useSelection } from './use-selection.ts'
@@ -11,10 +12,18 @@ import { useSelection } from './use-selection.ts'
 export type IdleViewState = {
     type: 'idle'
     selectedIds: Set<string>
-    mouseDown?: {
-        x: number
-        y: number
-    }
+    mouseDown?:
+        | {
+              type: 'overlay'
+              x: number
+              y: number
+          }
+        | {
+              type: 'node'
+              id: string
+              x: number
+              y: number
+          }
 }
 
 export function useIdleViewModel(params: ViewModelParams) {
@@ -24,13 +33,18 @@ export function useIdleViewModel(params: ViewModelParams) {
     const goToEditSticker = useGoToEditSticker(params)
     const goToAddSticker = useGoToAddSticker(params)
     const goToSelectionWindow = useGoToSelectionWindow(params)
+    const goToNodesDragging = useGoToNodesDragging(params)
     const mouseDown = useMouseDown(params)
 
     return (idleState: IdleViewState): ViewModel => ({
         nodes: nodesModel.nodes.map((node) => ({
             ...node,
             isSelected: selection.isSelected({ idleState, id: node.id }),
-            onClick: (e) => {
+            onMouseDown: (e) => mouseDown.handleNodeMouseDown({ idleState, id: node.id, e }),
+            onMouseUp: (e) => {
+                if (!mouseDown.getIsStickerMouseDown({ idleState, id: node.id })) {
+                    return
+                }
                 const result = goToEditSticker.handleNodeClick({ e, idleState, id: node.id })
                 if (result.preventNext) return
 
@@ -39,9 +53,6 @@ export function useIdleViewModel(params: ViewModelParams) {
         })),
         layout: {
             onKeyDown: (e) => {
-                const result = goToEditSticker.handleKeyDown({ e, idleState })
-                if (result.preventNext) return
-
                 deleteSelected.handleKeyDown({ e, idleState })
                 goToAddSticker.handleKeyDown({ e })
             },
@@ -51,7 +62,10 @@ export function useIdleViewModel(params: ViewModelParams) {
             onMouseUp: () => selection.handleOverlayMouseUp({ idleState }),
         },
         window: {
-            onMouseMove: (e) => goToSelectionWindow.handleWindowMouseMove({ e, idleState }),
+            onMouseMove: (e) => {
+                goToSelectionWindow.handleWindowMouseMove({ e, idleState })
+                goToNodesDragging.handleWindowMouseMove({ e, idleState })
+            },
             onMouseUp: () => mouseDown.handleWindowMouseUp({ idleState }),
         },
         actions: {

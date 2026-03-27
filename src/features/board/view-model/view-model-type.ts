@@ -10,6 +10,8 @@ export type ViewModel = {
         isEditing?: boolean
         onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
         onTextChange?: (text: string) => void
+        onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void
+        onMouseUp?: (e: React.MouseEvent<HTMLButtonElement>) => void
     }>
     selectionWindow?: Rect
     layout?: {
