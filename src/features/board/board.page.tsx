@@ -25,14 +25,16 @@ function BoardPage() {
     const viewModel = useViewModel({ nodesModel, windowPositionModel, canvasRect, nodesRects })
 
     useWindowEvents(viewModel)
+    
+    const windowPosition = viewModel?.windowPosition ?? windowPositionModel.position
 
     return (
         <Layout tab-index={0} ref={layoutRef} onKeyDown={viewModel.layout?.onKeyDown}>
-            <Dots />
+            <Dots windowPosition={windowPosition} />
             <Canvas
                 ref={canvasRef}
                 onClick={viewModel.canvas?.onClick}
-                windowPosition={viewModel?.windowPosition ?? windowPositionModel.position}
+                windowPosition={windowPosition}
                 overlay={<Overlay onClick={viewModel.overlay?.onClick} onMouseDown={viewModel.overlay?.onMouseDown} />}
             >
                 {viewModel?.nodes?.map((node) => (

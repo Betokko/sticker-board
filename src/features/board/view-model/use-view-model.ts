@@ -10,6 +10,7 @@ import { type SelectionWindowViewState, useSelectionWindowViwModel } from './var
 import { useWindowDraggingViwModel, type WindowDraggingViewState } from './variants/window-dragging.ts'
 import type { ViewModelParams } from './view-model-params.ts'
 import type { ViewModel } from './view-model-type.ts'
+import {useZoomDecorator} from "@/features/board/view-model/decorator/zoom.ts";
 
 export type UseViewModel =
     | IdleViewState
@@ -28,19 +29,29 @@ export function useViewModel(params: Omit<ViewModelParams, 'setViewState'>): Vie
     const editStickerViewModel = useEditStickerViwModel(newParams)
     const nodesDraggingViewModel = useNodesDraggingViwModel(newParams)
     const windowDraggingViewModel = useWindowDraggingViwModel(newParams)
+    
+    const zoomDecorator = useZoomDecorator(newParams)
 
+    let viewModel: ViewModel
     switch (viewState.type) {
         case 'idle':
-            return idleViewModel(viewState)
+            viewModel = idleViewModel(viewState)
+            break
         case 'selection-window':
-            return selectionWindowViewModel(viewState)
+            viewModel = selectionWindowViewModel(viewState)
+            break
         case 'add-sticker':
-            return addStickerViewModel()
+            viewModel = addStickerViewModel()
+            break
         case 'edit-sticker':
-            return editStickerViewModel(viewState)
+            viewModel = editStickerViewModel(viewState)
+            break
         case 'nodes-dragging':
-            return nodesDraggingViewModel(viewState)
+            viewModel = nodesDraggingViewModel(viewState)
+            break
         case 'window-dragging':
-            return windowDraggingViewModel(viewState)
+            viewModel = windowDraggingViewModel(viewState)
+            break
     }
+    return zoomDecorator(viewModel)
 }

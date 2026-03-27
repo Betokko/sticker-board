@@ -1,8 +1,8 @@
-import { type Point, vectorFromPoints } from '../../domain/point.ts'
-import { pointOnScreenToCanvas } from '../../domain/screen-to-canvas.ts'
-import type { ViewModelParams } from '../view-model-params'
-import type { ViewModel } from '../view-model-type.ts'
-import { goToIdle } from './idle'
+import {type Point, vectorFromPoints} from '../../domain/point.ts'
+import {pointOnScreenToCanvas} from '../../domain/screen-to-canvas.ts'
+import type {ViewModelParams} from '../view-model-params'
+import type {ViewModel} from '../view-model-type.ts'
+import {goToIdle} from './idle'
 
 export type NodesDraggingViewState = {
     type: 'nodes-dragging'
@@ -11,7 +11,7 @@ export type NodesDraggingViewState = {
     nodesToMove: Set<string>
 }
 
-export function useNodesDraggingViwModel({ setViewState, nodesModel, canvasRect }: ViewModelParams) {
+export function useNodesDraggingViwModel({setViewState, nodesModel, windowPositionModel, canvasRect}: ViewModelParams) {
     const getNodes = (state: NodesDraggingViewState) =>
         nodesModel.nodes.map((node) => {
             if (state.nodesToMove.has(node.id)) {
@@ -25,7 +25,7 @@ export function useNodesDraggingViwModel({ setViewState, nodesModel, canvasRect 
             }
             return node
         })
-
+    
     return (state: NodesDraggingViewState): ViewModel => {
         const nodes = getNodes(state)
         return {
@@ -34,13 +34,17 @@ export function useNodesDraggingViwModel({ setViewState, nodesModel, canvasRect 
                 onMouseMove: (e) => {
                     setViewState({
                         ...state,
-                        endPoint: pointOnScreenToCanvas({ x: e.clientX, y: e.clientY }, canvasRect),
+                        endPoint: pointOnScreenToCanvas(
+                            {x: e.clientX, y: e.clientY},
+                            windowPositionModel.position,
+                            canvasRect
+                        ),
                     })
                 },
                 onMouseUp: () => {
                     const nodesToMove = nodes.filter((node) => state.nodesToMove.has(node.id))
                     nodesModel.updateNodesPositions(nodesToMove)
-                    setViewState(goToIdle({ selectedIds: state.nodesToMove }))
+                    setViewState(goToIdle({selectedIds: state.nodesToMove}))
                 },
             },
         }
@@ -48,10 +52,10 @@ export function useNodesDraggingViwModel({ setViewState, nodesModel, canvasRect 
 }
 
 export function goToNodesDragging({
-    startPoint,
-    endPoint,
-    nodesToMove,
-}: {
+                                      startPoint,
+                                      endPoint,
+                                      nodesToMove,
+                                  }: {
     startPoint: Point
     endPoint: Point
     nodesToMove: Set<string>
