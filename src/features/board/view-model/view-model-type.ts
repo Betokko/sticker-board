@@ -1,4 +1,5 @@
 import type { Rect } from '../domain/rect.ts'
+import type { WindowPosition } from '../model/window-position.ts'
 
 export type ViewModel = {
     nodes?: Array<{
@@ -14,6 +15,7 @@ export type ViewModel = {
         onMouseUp?: (e: React.MouseEvent<HTMLButtonElement>) => void
     }>
     selectionWindow?: Rect
+    windowPosition?: WindowPosition
     layout?: {
         onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void
     }

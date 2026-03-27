@@ -13,7 +13,13 @@ export type SelectionWindowViewState = {
     initialSelectedIds: Selection
 }
 
-export function useSelectionWindowViwModel({ setViewState, nodesModel, canvasRect, nodesRects }: ViewModelParams) {
+export function useSelectionWindowViwModel({
+    setViewState,
+    nodesModel,
+    canvasRect,
+    nodesRects,
+    windowPositionModel,
+}: ViewModelParams) {
     const getNodes = (state: SelectionWindowViewState, selectionWindowRect: Rect) =>
         nodesModel.nodes.map((node) => {
             const nodeRect: Rect = {
@@ -39,7 +45,11 @@ export function useSelectionWindowViwModel({ setViewState, nodesModel, canvasRec
                 onMouseMove: (e) => {
                     setViewState({
                         ...state,
-                        endPoint: pointOnScreenToCanvas({ x: e.clientX, y: e.clientY }, canvasRect),
+                        endPoint: pointOnScreenToCanvas(
+                            { x: e.clientX, y: e.clientY },
+                            windowPositionModel.position,
+                            canvasRect,
+                        ),
                     })
                 },
                 onMouseUp: () => {

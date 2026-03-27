@@ -3,7 +3,7 @@ import { pointOnScreenToCanvas } from '@/features/board/domain/screen-to-canvas.
 import type { IdleViewState } from '@/features/board/view-model/variants/idle/index.ts'
 import type { ViewModelParams } from '@/features/board/view-model/view-model-params.ts'
 
-export function useMouseDown({ setViewState, canvasRect }: ViewModelParams) {
+export function useMouseDown({ setViewState, canvasRect, windowPositionModel }: ViewModelParams) {
     const handleOverlayMouseDown = ({
         idleState,
         e,
@@ -11,10 +11,10 @@ export function useMouseDown({ setViewState, canvasRect }: ViewModelParams) {
         idleState: IdleViewState
         e: React.MouseEvent<HTMLDivElement>
     }) => {
-        const point = pointOnScreenToCanvas({ x: e.clientX, y: e.clientY }, canvasRect)
+        const point = pointOnScreenToCanvas({ x: e.clientX, y: e.clientY }, windowPositionModel.position, canvasRect)
         setViewState({
             ...idleState,
-            mouseDown: { type: 'overlay', ...point },
+            mouseDown: { type: 'overlay', isRightClick: e.button === 2, ...point },
         })
     }
 
@@ -27,10 +27,10 @@ export function useMouseDown({ setViewState, canvasRect }: ViewModelParams) {
         id: string
         e: React.MouseEvent<HTMLButtonElement>
     }) => {
-        const point = pointOnScreenToCanvas({ x: e.clientX, y: e.clientY }, canvasRect)
+        const point = pointOnScreenToCanvas({ x: e.clientX, y: e.clientY }, windowPositionModel.position, canvasRect)
         setViewState({
             ...idleState,
-            mouseDown: { type: 'node', id, ...point },
+            mouseDown: { type: 'node', isRightClick: e.button === 2, id, ...point },
         })
     }
 

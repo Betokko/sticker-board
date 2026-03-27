@@ -3,7 +3,8 @@ import { useCanvasRect } from './hooks/use-canvas-rect.ts'
 import { useLayoutFocus } from './hooks/use-layout-focus.ts'
 import { useNodesRects } from './hooks/use-nodes-rects.ts'
 import { useWindowEvents } from './hooks/use-window-events.ts'
-import { useNodes } from './model/use-nodes.ts'
+import { nodes } from './model/nodes.ts'
+import { useWindowPositionModel } from './model/window-position.ts'
 import { ActionButton } from './ui/ActionButton.tsx'
 import { Actions } from './ui/Actions.tsx'
 import { Canvas } from './ui/Canvas.tsx'
@@ -15,23 +16,30 @@ import { Sticker } from './ui/Sticker.tsx'
 import { useViewModel } from './view-model/use-view-model.ts'
 
 function BoardPage() {
-    const nodesModel = useNodes()
+    const nodesModel = nodes()
+    const windowPositionModel = useWindowPositionModel()
     const { canvasRef, canvasRect } = useCanvasRect()
     const { layoutRef } = useLayoutFocus()
     const { nodeRef, nodesRects } = useNodesRects()
-    const viewModel = useViewModel({ nodesModel, canvasRect, nodesRects })
+
+    const viewModel = useViewModel({ nodesModel, windowPositionModel, canvasRect, nodesRects })
+
     useWindowEvents(viewModel)
 
     return (
         <Layout tab-index={0} ref={layoutRef} onKeyDown={viewModel.layout?.onKeyDown}>
             <Dots />
-            <Canvas ref={canvasRef} onClick={viewModel.canvas?.onClick}>
-                <Overlay onClick={viewModel.overlay?.onClick} onMouseDown={viewModel.overlay?.onMouseDown} />
+            <Canvas
+                ref={canvasRef}
+                onClick={viewModel.canvas?.onClick}
+                windowPosition={viewModel?.windowPosition ?? windowPositionModel.position}
+                overlay={<Overlay onClick={viewModel.overlay?.onClick} onMouseDown={viewModel.overlay?.onMouseDown} />}
+            >
                 {viewModel?.nodes?.map((node) => (
                     <Sticker {...node} ref={nodeRef} key={node.id} />
                 ))}
+                {viewModel.selectionWindow && <SelectionWindow {...viewModel.selectionWindow} />}
             </Canvas>
-            {viewModel.selectionWindow && <SelectionWindow {...viewModel.selectionWindow} />}
             <Actions>
                 <ActionButton
                     title='Добавить стикер (Ctrl+S)'

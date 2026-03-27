@@ -1,12 +1,13 @@
-import type { ViewModelParams } from '../view-model-params'
-import type { ViewModel } from '../view-model-type.ts'
-import { goToIdle } from './idle'
+import type {ViewModelParams} from '../view-model-params'
+import type {ViewModel} from '../view-model-type.ts'
+import {goToIdle} from './idle'
+import {pointOnScreenToCanvas} from "@/features/board/domain/screen-to-canvas.ts";
 
 export type AddStickerViewState = {
     type: 'add-sticker'
 }
 
-export function useAddStickerViwModel({ setViewState, nodesModel, canvasRect }: ViewModelParams) {
+export function useAddStickerViwModel({setViewState, nodesModel, windowPositionModel, canvasRect}: ViewModelParams) {
     return (): ViewModel => ({
         nodes: nodesModel.nodes,
         layout: {
@@ -17,10 +18,14 @@ export function useAddStickerViwModel({ setViewState, nodesModel, canvasRect }: 
         canvas: {
             onClick: (e) => {
                 if (!canvasRect) return
+                const point = pointOnScreenToCanvas(
+                    {x: e.clientX, y: e.clientY},
+                    windowPositionModel.position,
+                    canvasRect
+                )
                 nodesModel.addSticker({
                     text: 'New sticker',
-                    x: e.clientX - canvasRect.x,
-                    y: e.clientY - canvasRect.y,
+                    ...point,
                 })
                 setViewState(goToIdle())
             },

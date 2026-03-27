@@ -7,6 +7,7 @@ import { type AddStickerViewState, useAddStickerViwModel } from './variants/add-
 import { type EditStickerViewState, useEditStickerViwModel } from './variants/edit-sticker.ts'
 import { goToIdle, type IdleViewState, useIdleViewModel } from './variants/idle'
 import { type SelectionWindowViewState, useSelectionWindowViwModel } from './variants/selection-window.ts'
+import { useWindowDraggingViwModel, type WindowDraggingViewState } from './variants/window-dragging.ts'
 import type { ViewModelParams } from './view-model-params.ts'
 import type { ViewModel } from './view-model-type.ts'
 
@@ -16,6 +17,7 @@ export type UseViewModel =
     | SelectionWindowViewState
     | EditStickerViewState
     | NodesDraggingViewState
+    | WindowDraggingViewState
 
 export function useViewModel(params: Omit<ViewModelParams, 'setViewState'>): ViewModel {
     const [viewState, setViewState] = useState<UseViewModel>(() => goToIdle())
@@ -25,6 +27,7 @@ export function useViewModel(params: Omit<ViewModelParams, 'setViewState'>): Vie
     const selectionWindowViewModel = useSelectionWindowViwModel(newParams)
     const editStickerViewModel = useEditStickerViwModel(newParams)
     const nodesDraggingViewModel = useNodesDraggingViwModel(newParams)
+    const windowDraggingViewModel = useWindowDraggingViwModel(newParams)
 
     switch (viewState.type) {
         case 'idle':
@@ -37,5 +40,7 @@ export function useViewModel(params: Omit<ViewModelParams, 'setViewState'>): Vie
             return editStickerViewModel(viewState)
         case 'nodes-dragging':
             return nodesDraggingViewModel(viewState)
+        case 'window-dragging':
+            return windowDraggingViewModel(viewState)
     }
 }

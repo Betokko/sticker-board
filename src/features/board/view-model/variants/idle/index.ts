@@ -1,3 +1,4 @@
+import { useGoToWindowDragging } from '@/features/board/view-model/variants/idle/use-go-to-window-dragging.ts'
 import type { Selection } from '../../../domain/selection.ts'
 import type { ViewModelParams } from '../../view-model-params'
 import type { ViewModel } from '../../view-model-type.ts'
@@ -17,12 +18,14 @@ export type IdleViewState = {
               type: 'overlay'
               x: number
               y: number
+              isRightClick: boolean
           }
         | {
               type: 'node'
               id: string
               x: number
               y: number
+              isRightClick: boolean
           }
 }
 
@@ -34,6 +37,7 @@ export function useIdleViewModel(params: ViewModelParams) {
     const goToAddSticker = useGoToAddSticker(params)
     const goToSelectionWindow = useGoToSelectionWindow(params)
     const goToNodesDragging = useGoToNodesDragging(params)
+    const goToWindowDragging = useGoToWindowDragging(params)
     const mouseDown = useMouseDown(params)
 
     return (idleState: IdleViewState): ViewModel => ({
@@ -65,6 +69,7 @@ export function useIdleViewModel(params: ViewModelParams) {
             onMouseMove: (e) => {
                 goToSelectionWindow.handleWindowMouseMove({ e, idleState })
                 goToNodesDragging.handleWindowMouseMove({ e, idleState })
+                goToWindowDragging.handleWindowMouseMove({ e, idleState })
             },
             onMouseUp: () => mouseDown.handleWindowMouseUp({ idleState }),
         },

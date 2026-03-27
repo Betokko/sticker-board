@@ -13,7 +13,7 @@ type StickerNode = NodeBase<'sticker'> & {
 
 export type Node = StickerNode
 
-export function useNodes() {
+export function nodes() {
     const [nodes, setNodes] = useState<Node[]>([
         { id: '1', y: 100, x: 100, text: 'HELLO_1', type: 'sticker' },
         { id: '2', y: 200, x: 200, text: 'HELLO_2', type: 'sticker' },
@@ -50,4 +50,4 @@ export function useNodes() {
     }
 }
 
-export type NodesModel = ReturnType<typeof useNodes>
+export type NodesModel = ReturnType<typeof nodes>
