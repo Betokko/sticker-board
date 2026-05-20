@@ -1,9 +1,9 @@
-import {ViewModelParams} from "@/features/board/view-model/view-model-params.ts";
-import {ViewModel} from "@/features/board/view-model/view-model-type.ts";
-import {pointOnScreenToCanvas} from "@/features/board/domain/screen-to-canvas.ts";
-import {vectorFromPoints} from "@/features/board/domain/point.ts";
+import { vectorFromPoints } from '@/features/board/domain/point.ts'
+import { pointOnScreenToCanvas } from '@/features/board/domain/screen-to-canvas.ts'
+import type { ViewModelParams } from '@/features/board/view-model/view-model-params.ts'
+import type { ViewModel } from '@/features/board/view-model/view-model-type.ts'
 
-export function useZoomDecorator({windowPositionModel, canvasRect}: ViewModelParams) {
+export function useZoomDecorator({ windowPositionModel, canvasRect }: ViewModelParams) {
     return (viewModel: ViewModel): ViewModel => {
         return {
             ...viewModel,
@@ -13,15 +13,15 @@ export function useZoomDecorator({windowPositionModel, canvasRect}: ViewModelPar
                     viewModel.window?.onMouseWheel?.(e)
                     const delta = e.deltaY > 0 ? 0.9 : 1.1
                     const currentPoint = pointOnScreenToCanvas(
-                        {x: e.clientX, y: e.clientY},
+                        { x: e.clientX, y: e.clientY },
                         windowPositionModel.position,
                         canvasRect,
                     )
                     const newZoom = windowPositionModel.position.zoom * delta
                     const newPoint = pointOnScreenToCanvas(
-                        {x: e.clientX, y: e.clientY},
-                        {...windowPositionModel.position, zoom: newZoom},
-                        canvasRect
+                        { x: e.clientX, y: e.clientY },
+                        { ...windowPositionModel.position, zoom: newZoom },
+                        canvasRect,
                     )
                     const mouseDiff = vectorFromPoints(currentPoint, newPoint)
                     windowPositionModel.setPosition({
@@ -29,8 +29,8 @@ export function useZoomDecorator({windowPositionModel, canvasRect}: ViewModelPar
                         y: windowPositionModel.position.y - mouseDiff.y,
                         zoom: newZoom,
                     })
-                }
-            }
+                },
+            },
         }
     }
 }

@@ -44,13 +44,13 @@ function BoardPage() {
             </Canvas>
             <Actions>
                 <ActionButton
-                    title='Добавить стикер (Ctrl+S)'
+                    title='Добавить стикер (S)'
                     isActive={viewModel.actions?.addSticker?.isActive}
                     onClick={viewModel.actions?.addSticker?.onClick}
                 >
                     <StickerIcon />
                 </ActionButton>
-                <ActionButton title='Добавить стрелку (Ctrl+A)' isActive={false} onClick={() => {}}>
+                <ActionButton title='Добавить стрелку (A)' isActive={false} onClick={() => {}}>
                     <ArrowRightIcon />
                 </ActionButton>
             </Actions>
