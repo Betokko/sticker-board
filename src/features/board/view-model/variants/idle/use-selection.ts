@@ -14,7 +14,7 @@ export function useSelection({ setViewState }: ViewModelParams) {
         idleState,
         id,
     }: {
-        e: React.MouseEvent<HTMLButtonElement>
+        e: React.MouseEvent
         idleState: IdleViewState
         id: string
     }) => {

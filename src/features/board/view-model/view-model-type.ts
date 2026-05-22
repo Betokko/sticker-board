@@ -1,19 +1,36 @@
+import type { Point } from '@/features/board/domain/point.ts'
 import type { Rect } from '../domain/rect.ts'
 import type { WindowPosition } from '../model/window-position.ts'
 
+type ViewModelStickerNode = {
+    id: string
+    type: 'sticker'
+    text: string
+    x: number
+    y: number
+    isSelected?: boolean
+    isEditing?: boolean
+    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
+    onTextChange?: (text: string) => void
+    onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void
+    onMouseUp?: (e: React.MouseEvent<HTMLButtonElement>) => void
+}
+
+type ViewModelArrowNode = {
+    id: string
+    type: 'arrow'
+    start: Point
+    end: Point
+    isSelected?: boolean
+    onClick?: (e: React.MouseEvent<SVGPathElement>) => void
+    onMouseDown?: (e: React.MouseEvent<SVGPathElement>) => void
+    onMouseUp?: (e: React.MouseEvent<SVGPathElement>) => void
+}
+
+export type ViewModelNode = ViewModelStickerNode | ViewModelArrowNode
+
 export type ViewModel = {
-    nodes?: Array<{
-        id: string
-        text: string
-        x: number
-        y: number
-        isSelected?: boolean
-        isEditing?: boolean
-        onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
-        onTextChange?: (text: string) => void
-        onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void
-        onMouseUp?: (e: React.MouseEvent<HTMLButtonElement>) => void
-    }>
+    nodes: ViewModelNode[]
     selectionWindow?: Rect
     windowPosition?: WindowPosition
     layout?: {
@@ -33,9 +50,12 @@ export type ViewModel = {
         onMouseWheel?: (e: WheelEvent) => void
     }
     actions?: {
-        addSticker?: {
-            isActive: boolean
-            onClick: (e: React.MouseEvent<HTMLButtonElement>) => void
-        }
+        addSticker?: ViewModelAction
+        addArrow?: ViewModelAction
     }
+}
+
+export type ViewModelAction = {
+    isActive: boolean
+    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
 }

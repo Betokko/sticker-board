@@ -11,7 +11,7 @@ export type EditStickerViewState = {
 export function useEditStickerViwModel({ setViewState, nodesModel }: ViewModelParams) {
     return (state: EditStickerViewState): ViewModel => ({
         nodes: nodesModel.nodes.map((node) =>
-            node.id === state.id
+            node.id === state.id && node.type === 'sticker'
                 ? {
                       ...node,
                       isSelected: true,
@@ -25,10 +25,6 @@ export function useEditStickerViwModel({ setViewState, nodesModel }: ViewModelPa
             onKeyDown: (e) => {
                 if (e.key === 'Escape') setViewState(goToIdle())
                 if (e.key === 'Enter') {
-                    // if (state.newText) {
-                    //     nodesModel.updateStickerText(state.id, state.newText)
-                    //     setViewState(goToIdle())
-                    // }
                 }
             },
         },
@@ -38,12 +34,6 @@ export function useEditStickerViwModel({ setViewState, nodesModel }: ViewModelPa
                 setViewState(goToIdle())
             },
         },
-        // actions: {
-        //     addSticker: {
-        //         isActive: true,
-        //         onClick: () => setViewState(goToIdle()),
-        //     },
-        // },
     })
 }
 

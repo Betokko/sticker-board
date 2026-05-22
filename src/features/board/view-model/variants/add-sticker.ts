@@ -2,6 +2,7 @@ import type {ViewModelParams} from '../view-model-params'
 import type {ViewModel} from '../view-model-type.ts'
 import {goToIdle} from './idle'
 import {pointOnScreenToCanvas} from "@/features/board/domain/screen-to-canvas.ts";
+import {goToAddArrow} from "@/features/board/view-model/variants/add-arrow.ts";
 
 export type AddStickerViewState = {
     type: 'add-sticker'
@@ -10,11 +11,6 @@ export type AddStickerViewState = {
 export function useAddStickerViwModel({setViewState, nodesModel, windowPositionModel, canvasRect}: ViewModelParams) {
     return (): ViewModel => ({
         nodes: nodesModel.nodes,
-        layout: {
-            onKeyDown: (e) => {
-                if (e.key === 'Escape') setViewState(goToIdle())
-            },
-        },
         canvas: {
             onClick: (e) => {
                 if (!canvasRect) return
@@ -35,6 +31,10 @@ export function useAddStickerViwModel({setViewState, nodesModel, windowPositionM
                 isActive: true,
                 onClick: () => setViewState(goToIdle()),
             },
+            addArrow: {
+                isActive: false,
+                onClick: () => setViewState(goToAddArrow()),
+            }
         },
     })
 }

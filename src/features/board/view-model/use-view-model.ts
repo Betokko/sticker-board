@@ -1,4 +1,8 @@
 import { useState } from 'react'
+import { useCommonActionsDecorator } from '@/features/board/view-model/decorator/common-actions.ts'
+import { useZoomDecorator } from '@/features/board/view-model/decorator/zoom.ts'
+import { type AddArrowViewState, useAddArrowViwModel } from '@/features/board/view-model/variants/add-arrow.ts'
+import { type DrowArrowViewState, useDrowArrowViwModel } from '@/features/board/view-model/variants/drow-arrow.ts'
 import {
     type NodesDraggingViewState,
     useNodesDraggingViwModel,
@@ -10,10 +14,11 @@ import { type SelectionWindowViewState, useSelectionWindowViwModel } from './var
 import { useWindowDraggingViwModel, type WindowDraggingViewState } from './variants/window-dragging.ts'
 import type { ViewModelParams } from './view-model-params.ts'
 import type { ViewModel } from './view-model-type.ts'
-import {useZoomDecorator} from "@/features/board/view-model/decorator/zoom.ts";
 
 export type UseViewModel =
     | IdleViewState
+    | AddArrowViewState
+    | DrowArrowViewState
     | AddStickerViewState
     | SelectionWindowViewState
     | EditStickerViewState
@@ -24,24 +29,33 @@ export function useViewModel(params: Omit<ViewModelParams, 'setViewState'>): Vie
     const [viewState, setViewState] = useState<UseViewModel>(() => goToIdle())
     const newParams = { ...params, setViewState }
     const idleViewModel = useIdleViewModel(newParams)
+    const addArrowViewModel = useAddArrowViwModel(newParams)
+    const drowArrowViewModel = useDrowArrowViwModel(newParams)
     const addStickerViewModel = useAddStickerViwModel(newParams)
     const selectionWindowViewModel = useSelectionWindowViwModel(newParams)
     const editStickerViewModel = useEditStickerViwModel(newParams)
     const nodesDraggingViewModel = useNodesDraggingViwModel(newParams)
     const windowDraggingViewModel = useWindowDraggingViwModel(newParams)
-    
+
     const zoomDecorator = useZoomDecorator(newParams)
+    const commonActionsDecorator = useCommonActionsDecorator(newParams)
 
     let viewModel: ViewModel
     switch (viewState.type) {
         case 'idle':
-            viewModel = idleViewModel(viewState)
+            viewModel = commonActionsDecorator(idleViewModel(viewState))
+            break
+        case 'add-arrow':
+            viewModel = commonActionsDecorator(addArrowViewModel())
+            break
+        case 'drow-arrow':
+            viewModel = drowArrowViewModel(viewState)
+            break
+        case 'add-sticker':
+            viewModel = commonActionsDecorator(addStickerViewModel())
             break
         case 'selection-window':
             viewModel = selectionWindowViewModel(viewState)
-            break
-        case 'add-sticker':
-            viewModel = addStickerViewModel()
             break
         case 'edit-sticker':
             viewModel = editStickerViewModel(viewState)

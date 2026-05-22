@@ -7,6 +7,18 @@ export type Rect = {
     height: number
 }
 
+export function createRectFromDimensions(
+    start: Point,
+    dimensions: { width: number; height: number },
+): Rect {
+    return {
+        x: start.x,
+        y: start.y,
+        width: dimensions.width,
+        height: dimensions.height,
+    };
+}
+
 export function createRectFromPoints(start: Point, end: Point): Rect {
     return {
         x: Math.min(start.x, end.x),
@@ -27,4 +39,11 @@ export function isRectInIntersecting(rect1: Rect, rect2: Rect) {
         rect1.y <= rect2.y + rect2.height &&
         rect1.y + rect1.height >= rect2.y
     )
+}
+
+export function addPoints(point1: Point, point2: Point) {
+    return {
+        x: point1.x + point2.x,
+        y: point1.y + point2.y,
+    }
 }

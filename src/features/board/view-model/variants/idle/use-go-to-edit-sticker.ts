@@ -10,7 +10,7 @@ export function useGoToEditSticker({ setViewState }: ViewModelParams) {
     }: {
         idleState: IdleViewState
         id: string
-        e: React.MouseEvent<HTMLButtonElement>
+        e: React.MouseEvent
     }) => {
         if (idleState.selectedIds.size === 1 && idleState.selectedIds.has(id) && !e.ctrlKey && !e.shiftKey) {
             setViewState(goToEditSticker(id))

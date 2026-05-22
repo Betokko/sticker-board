@@ -9,7 +9,7 @@ export function useMouseDown({ setViewState, canvasRect, windowPositionModel }: 
         e,
     }: {
         idleState: IdleViewState
-        e: React.MouseEvent<HTMLDivElement>
+        e: React.MouseEvent
     }) => {
         const point = pointOnScreenToCanvas({ x: e.clientX, y: e.clientY }, windowPositionModel.position, canvasRect)
         setViewState({
@@ -25,7 +25,7 @@ export function useMouseDown({ setViewState, canvasRect, windowPositionModel }: 
     }: {
         idleState: IdleViewState
         id: string
-        e: React.MouseEvent<HTMLButtonElement>
+        e: React.MouseEvent
     }) => {
         const point = pointOnScreenToCanvas({ x: e.clientX, y: e.clientY }, windowPositionModel.position, canvasRect)
         setViewState({
