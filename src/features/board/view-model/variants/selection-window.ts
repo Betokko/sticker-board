@@ -1,5 +1,6 @@
-import type { Point } from '../../domain/point.ts'
-import {createRectFromDimensions, createRectFromPoints, isRectInIntersecting, type Rect} from '../../domain/rect.ts'
+import { createRelativeBase } from '@/features/board/view-model/decorator/resolve-relative.ts'
+import { type Point, resolveRelativePoint } from '../../domain/point.ts'
+import { createRectFromDimensions, createRectFromPoints, isRectInIntersecting, type Rect } from '../../domain/rect.ts'
 import { pointOnScreenToCanvas } from '../../domain/screen-to-canvas.ts'
 import { type Selection, selectItems } from '../../domain/selection.ts'
 import type { ViewModelParams } from '../view-model-params'
@@ -20,19 +21,24 @@ export function useSelectionWindowViwModel({
     nodesRects,
     windowPositionModel,
 }: ViewModelParams) {
-    const getNodes = (state: SelectionWindowViewState, selectionWindowRect: Rect) =>
-        nodesModel.nodes.map((node) => {
+    const getNodes = (state: SelectionWindowViewState, selectionWindowRect: Rect) => {
+        const relativeBase = createRelativeBase(nodesModel.nodes)
+        return nodesModel.nodes.map((node) => {
             const nodeDimensions = nodesRects[node.id]
             const nodeRect =
                 node.type === 'sticker'
                     ? createRectFromDimensions(node, nodeDimensions)
-                    : createRectFromPoints(node.start, node.end)
+                    : createRectFromPoints(
+                          resolveRelativePoint(relativeBase, node.start),
+                          resolveRelativePoint(relativeBase, node.end),
+                      )
             return {
                 ...node,
                 isSelected:
                     isRectInIntersecting(nodeRect, selectionWindowRect) || state.initialSelectedIds.has(node.id),
             }
         })
+    }
 
     return (state: SelectionWindowViewState): ViewModel => {
         const rect = createRectFromPoints(state.startPoint, state.endPoint)

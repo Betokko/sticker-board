@@ -1,29 +1,39 @@
-import {Point, vectorFromPoints} from "@/features/board/domain/point.ts";
-import clsx from "clsx";
-import {Ref} from "react";
+import clsx from 'clsx'
+import type { Ref } from 'react'
+import { diffPoints, type Point } from '@/features/board/domain/point.ts'
 
-export function Arrow({start, end, ref, isSelected, onClick, onMouseDown, onMouseUp}: {
+export function Arrow({
+    start,
+    end,
+    ref,
+    isSelected,
+    noPointerEvents,
+    onClick,
+    onMouseDown,
+    onMouseUp,
+}: {
     id: string
     start: Point
     end: Point
     ref: Ref<SVGPathElement>
     isSelected?: boolean
+    noPointerEvents?: boolean
     onClick?: (e: React.MouseEvent<SVGPathElement>) => void
     onMouseDown?: (e: React.MouseEvent<SVGPathElement>) => void
     onMouseUp?: (e: React.MouseEvent<SVGPathElement>) => void
 }) {
-    const diff = vectorFromPoints(start, end)
+    const diff = diffPoints(start, end)
     const angle = Math.atan2(diff.y, diff.x)
     const arrowRightAngle = angle + Math.PI * (1 - 1 / 8)
     const arrowLeftAngle = angle - Math.PI * (1 - 1 / 8)
     const arrowRightDiff = [Math.cos(arrowRightAngle) * 12, Math.sin(arrowRightAngle) * 12]
     const arrowLeftDiff = [Math.cos(arrowLeftAngle) * 12, Math.sin(arrowLeftAngle) * 12]
     return (
-        <svg className="absolute left-0 top-0 pointer-events-none overflow-visible">
+        <svg className='absolute left-0 top-0 pointer-events-none overflow-visible z-1000'>
             <path
                 className={clsx(
-                    'pointer-events-auto',
-                    isSelected  && 'stroke-blue-500 fill-blue-500'
+                    noPointerEvents ? 'pointer-events-none' : 'pointer-events-auto',
+                    isSelected && 'stroke-blue-500 fill-blue-500',
                 )}
                 stroke='black'
                 ref={ref}

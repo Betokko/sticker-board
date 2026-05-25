@@ -1,9 +1,9 @@
-import {type Point, vectorFromPoints} from '../../domain/point.ts'
-import {pointOnScreenToCanvas} from '../../domain/screen-to-canvas.ts'
-import type {ViewModelParams} from '../view-model-params'
-import type {ViewModel} from '../view-model-type.ts'
-import {goToIdle} from './idle'
-import {addPoints} from "@/features/board/domain/rect.ts";
+import { addPoints } from '@/features/board/domain/rect.ts'
+import { diffPoints, isResolvePoint, type Point } from '../../domain/point.ts'
+import { pointOnScreenToCanvas } from '../../domain/screen-to-canvas.ts'
+import type { ViewModelParams } from '../view-model-params'
+import type { ViewModel } from '../view-model-type.ts'
+import { goToIdle } from './idle'
 
 export type NodesDraggingViewState = {
     type: 'nodes-dragging'
@@ -12,31 +12,36 @@ export type NodesDraggingViewState = {
     nodesToMove: Set<string>
 }
 
-export function useNodesDraggingViwModel({setViewState, nodesModel, windowPositionModel, canvasRect}: ViewModelParams) {
+export function useNodesDraggingViwModel({
+    setViewState,
+    nodesModel,
+    windowPositionModel,
+    canvasRect,
+}: ViewModelParams) {
     const getNodes = (state: NodesDraggingViewState) =>
         nodesModel.nodes.map((node) => {
             if (state.nodesToMove.has(node.id)) {
-                const diff = vectorFromPoints(state.startPoint, state.endPoint)
+                const diff = diffPoints(state.startPoint, state.endPoint)
                 if (node.type === 'arrow') {
                     return {
                         ...node,
-                        start: addPoints(node.start, diff),
-                        end: addPoints(node.end, diff),
+                        start: isResolvePoint(node.start) ? node.start : addPoints(node.start, diff),
+                        end: isResolvePoint(node.end) ? node.end : addPoints(node.end, diff),
                         isSelected: true,
                     }
                 }
                 return {
-                ...node,
-                ...addPoints(node, diff),
+                    ...node,
+                    ...addPoints(node, diff),
                     isSelected: true,
                 }
             }
             return node
         })
-    
+
     return (state: NodesDraggingViewState): ViewModel => {
-        const nodes = getNodes(state);
-        
+        const nodes = getNodes(state)
+
         return {
             nodes,
             window: {
@@ -48,11 +53,11 @@ export function useNodesDraggingViwModel({setViewState, nodesModel, windowPositi
                         },
                         windowPositionModel.position,
                         canvasRect,
-                    );
+                    )
                     setViewState({
                         ...state,
                         endPoint: currentPoint,
-                    });
+                    })
                 },
                 onMouseUp: () => {
                     const nodesToMove = nodes
@@ -63,14 +68,14 @@ export function useNodesDraggingViwModel({setViewState, nodesModel, windowPositi
                                     {
                                         id: node.id,
                                         point: node.start,
-                                        type: "start" as const,
+                                        type: 'start' as const,
                                     },
                                     {
                                         id: node.id,
                                         point: node.end,
-                                        type: "end" as const,
+                                        type: 'end' as const,
                                     },
-                                ];
+                                ]
                             }
                             return [
                                 {
@@ -80,32 +85,31 @@ export function useNodesDraggingViwModel({setViewState, nodesModel, windowPositi
                                         y: node.y,
                                     },
                                 },
-                            ];
-                        });
-                    
-                    nodesModel.updateNodesPositions(nodesToMove);
-                    
+                            ]
+                        })
+
+                    nodesModel.updateNodesPositions(nodesToMove)
+
                     setViewState(
                         goToIdle({
                             selectedIds: state.nodesToMove,
                         }),
-                    );
+                    )
                 },
             },
-        };
-    };
+        }
+    }
 }
 
-export function goToNodesDragging(
-    {
-        startPoint,
-        endPoint,
-        nodesToMove,
-    }: {
-        startPoint: Point
-        endPoint: Point
-        nodesToMove: Set<string>
-    }): NodesDraggingViewState {
+export function goToNodesDragging({
+    startPoint,
+    endPoint,
+    nodesToMove,
+}: {
+    startPoint: Point
+    endPoint: Point
+    nodesToMove: Set<string>
+}): NodesDraggingViewState {
     return {
         type: 'nodes-dragging',
         startPoint,

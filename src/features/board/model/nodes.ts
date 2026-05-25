@@ -23,7 +23,12 @@ export function nodes() {
     const [nodes, setNodes] = useState<Node[]>([
         { id: '1', type: 'sticker', y: 100, x: 100, text: 'HELLO_1' },
         { id: '2', type: 'sticker', y: 200, x: 200, text: 'HELLO_2' },
-        { id: '3', type: 'arrow', start: { y: 110, x: 110 }, end: { y: 210, x: 210 } },
+        {
+            id: '3',
+            type: 'arrow',
+            start: { y: 10, x: 10, relativeTo: '1' },
+            end: { y: 20, x: 20, relativeTo: '2' },
+        },
     ])
 
     const addSticker = (data: Pick<StickerNode, 'text' | 'x' | 'y'>) => {
@@ -39,13 +44,24 @@ export function nodes() {
     }
 
     const deleteNodes = (ids: string[]) => {
-        setNodes((prev) => prev.filter((node) => !ids.includes(node.id)))
+        setNodes((prev) => {
+            const arrowsRelativeIds = prev
+                .filter(
+                    (n) =>
+                        (n.type === 'arrow' && n.start.relativeTo && ids.includes(n.start.relativeTo)) ||
+                        (n.type === 'arrow' && n.end.relativeTo && ids.includes(n.end.relativeTo)),
+                )
+                .map((n) => n.id)
+
+            return prev.filter((node) => !ids.includes(node.id) && !arrowsRelativeIds.includes(node.id))
+        })
     }
 
     const updateNodesPositions = (
         positions: {
             id: string
             point: Point
+            relativeTo?: string
             type?: 'start' | 'end'
         }[],
     ) => {

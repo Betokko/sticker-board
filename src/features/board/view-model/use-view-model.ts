@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useCommonActionsDecorator } from '@/features/board/view-model/decorator/common-actions.ts'
+import { useResolveRelativeStaticDecorator } from '@/features/board/view-model/decorator/resolve-relative.ts'
 import { useZoomDecorator } from '@/features/board/view-model/decorator/zoom.ts'
 import { type AddArrowViewState, useAddArrowViwModel } from '@/features/board/view-model/variants/add-arrow.ts'
-import { type DrowArrowViewState, useDrowArrowViwModel } from '@/features/board/view-model/variants/drow-arrow.ts'
+import { type DrawArrowViewState, useDrawArrowViewModel } from '@/features/board/view-model/variants/drow-arrow.ts'
 import {
     type NodesDraggingViewState,
     useNodesDraggingViwModel,
@@ -18,7 +19,7 @@ import type { ViewModel } from './view-model-type.ts'
 export type UseViewModel =
     | IdleViewState
     | AddArrowViewState
-    | DrowArrowViewState
+    | DrawArrowViewState
     | AddStickerViewState
     | SelectionWindowViewState
     | EditStickerViewState
@@ -30,7 +31,7 @@ export function useViewModel(params: Omit<ViewModelParams, 'setViewState'>): Vie
     const newParams = { ...params, setViewState }
     const idleViewModel = useIdleViewModel(newParams)
     const addArrowViewModel = useAddArrowViwModel(newParams)
-    const drowArrowViewModel = useDrowArrowViwModel(newParams)
+    const drawArrowViewModel = useDrawArrowViewModel(newParams)
     const addStickerViewModel = useAddStickerViwModel(newParams)
     const selectionWindowViewModel = useSelectionWindowViwModel(newParams)
     const editStickerViewModel = useEditStickerViwModel(newParams)
@@ -43,16 +44,19 @@ export function useViewModel(params: Omit<ViewModelParams, 'setViewState'>): Vie
     let viewModel: ViewModel
     switch (viewState.type) {
         case 'idle':
-            viewModel = commonActionsDecorator(idleViewModel(viewState))
+            viewModel = idleViewModel(viewState)
+            viewModel = commonActionsDecorator(viewModel)
             break
         case 'add-arrow':
-            viewModel = commonActionsDecorator(addArrowViewModel())
-            break
-        case 'drow-arrow':
-            viewModel = drowArrowViewModel(viewState)
+            viewModel = addArrowViewModel()
+            viewModel = commonActionsDecorator(viewModel)
             break
         case 'add-sticker':
-            viewModel = commonActionsDecorator(addStickerViewModel())
+            viewModel = addStickerViewModel()
+            viewModel = commonActionsDecorator(viewModel)
+            break
+        case 'draw-arrow':
+            viewModel = drawArrowViewModel(viewState)
             break
         case 'selection-window':
             viewModel = selectionWindowViewModel(viewState)
@@ -67,5 +71,9 @@ export function useViewModel(params: Omit<ViewModelParams, 'setViewState'>): Vie
             viewModel = windowDraggingViewModel(viewState)
             break
     }
-    return zoomDecorator(viewModel)
+
+    viewModel = zoomDecorator(viewModel)
+    viewModel = useResolveRelativeStaticDecorator(viewModel)
+
+    return viewModel
 }

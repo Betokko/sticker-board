@@ -1,24 +1,27 @@
-import type {ViewModelParams} from '../view-model-params'
-import type {ViewModel} from '../view-model-type.ts'
-import {goToIdle} from './idle'
-import {goToDrowArrow} from "@/features/board/view-model/variants/drow-arrow.ts";
-import {pointOnScreenToCanvas} from "@/features/board/domain/screen-to-canvas.ts";
+import { pointOnScreenToCanvas } from '@/features/board/domain/screen-to-canvas.ts'
+import { goToDrawArrow } from '@/features/board/view-model/variants/drow-arrow.ts'
+import type { ViewModelParams } from '../view-model-params'
+import type { ViewModel } from '../view-model-type.ts'
+import { goToIdle } from './idle'
 
 export type AddArrowViewState = {
     type: 'add-arrow'
 }
 
-export function useAddArrowViwModel({setViewState, nodesModel, windowPositionModel, canvasRect}: ViewModelParams) {
+export function useAddArrowViwModel({ setViewState, nodesModel, windowPositionModel, canvasRect }: ViewModelParams) {
     return (): ViewModel => ({
-        nodes: nodesModel.nodes.map(node => {
+        nodes: nodesModel.nodes.map((node) => {
             if (node.type === 'sticker') {
                 return {
                     ...node,
-                    onMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => setViewState(goToDrowArrow(pointOnScreenToCanvas(
-                        {x: e.clientX, y: e.clientY},
-                        windowPositionModel.position,
-                        canvasRect,
-                    )))
+                    onMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => {
+                        const point = pointOnScreenToCanvas(
+                            { x: e.clientX, y: e.clientY },
+                            windowPositionModel.position,
+                            canvasRect,
+                        )
+                        setViewState(goToDrawArrow(point, node.id))
+                    },
                 }
             }
             return node
@@ -30,11 +33,12 @@ export function useAddArrowViwModel({setViewState, nodesModel, windowPositionMod
             },
         },
         overlay: {
-            onMouseDown: (e) => setViewState(goToDrowArrow(pointOnScreenToCanvas(
-                {x: e.clientX, y: e.clientY},
-                windowPositionModel.position,
-                canvasRect,
-            ))),
+            onMouseDown: (e) =>
+                setViewState(
+                    goToDrawArrow(
+                        pointOnScreenToCanvas({ x: e.clientX, y: e.clientY }, windowPositionModel.position, canvasRect),
+                    ),
+                ),
         },
     })
 }
